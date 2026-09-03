@@ -21,7 +21,7 @@ Prueba el endpoint en `http://localhost:8080/api/demo`.
 
 ## Activar Amazon Cognito
 
-Completa el archivo `.env` con el emisor de tu User Pool y el App client que usara el flujo `client_credentials`:
+Completa el archivo `.env` con el emisor de tu User Pool y el App client que usara el flujo federado:
 
 ```properties
 COGNITO_ISSUER_URI=https://cognito-idp.<region>.amazonaws.com/<user-pool-id>
@@ -57,7 +57,7 @@ Una solicitud sin token, con un token expirado o con otro `client_id` responde `
 
 1. Al ejecutar `mvn spring-boot:run`, Spring Boot carga las propiedades desde `.env` mediante `application.yml`.
 2. El perfil predeterminado es `cognito`, por lo que la API inicia protegida. El perfil `local` debe activarse explicitamente y permite probar el endpoint sin autenticacion.
-3. El cliente solicita un access token a Cognito usando el flujo `client_credentials`, su `client_id` y su secreto.
+3. El cliente inicia Authorization Code con PKCE en Cognito Hosted UI. Cognito delega el login en Entra ID y emite un access token propio.
 4. El cliente envia el token a la API mediante el encabezado `Authorization`:
 
   ```http
@@ -89,4 +89,4 @@ sequenceDiagram
   end
 ```
 
-El `client_secret` se utiliza para obtener el token en Cognito. La API no lo necesita para validar el JWT y debe mantenerse fuera del codigo y del repositorio.
+El backend valida el access token de Cognito, pero no necesita conocer el `client_secret`. Para una SPA local, el App Client debe ser publico y usar PKCE; nunca se debe incluir un secreto en el codigo Angular.
