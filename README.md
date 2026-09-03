@@ -43,3 +43,30 @@ Authorization: Bearer <access-token-de-cognito>
 Spring Security obtiene las claves publicas del User Pool desde el `issuer-uri` y valida la firma y las fechas del token.
 
 Una solicitud sin token, con un token expirado o con otro `client_id` responde `401 Unauthorized`.
+
+## Flujo de la aplicacion
+
+1. Al ejecutar `mvn spring-boot:run`, Spring Boot carga las propiedades desde `.env` mediante `application.yml`.
+2. El perfil predeterminado es `cognito`, por lo que la API inicia protegida. El perfil `local` debe activarse explicitamente y permite probar el endpoint sin autenticacion.
+3. El cliente solicita un access token a Cognito usando el flujo `client_credentials`, su `client_id` y su secreto.
+4. El cliente envia el token a la API mediante el encabezado `Authorization`:
+
+  ```http
+  Authorization: Bearer <access-token-de-cognito>
+  ```
+
+5. Spring Security valida la firma, el emisor (`issuer`), la vigencia del JWT y los claims requeridos:
+  - `token_use` debe ser `access`.
+  - `client_id` debe coincidir con `COGNITO_CLIENT_ID`.
+6. Si el token es valido, la solicitud llega a `GET /api/demo` y la API responde `200 OK` con el JSON dummy.
+7. Si el token falta o no es valido, la solicitud se rechaza antes de llegar al controlador con `401 Unauthorized` y un mensaje JSON.
+
+```text
+Cliente -> Cognito: solicita access token con client_credentials
+Cognito -> Cliente: devuelve access token JWT
+Cliente -> API: GET /api/demo con Bearer token
+API -> API: valida firma, issuer, expiracion y client_id
+API -> Cliente: 200 OK o 401 Unauthorized
+```
+
+El `client_secret` se utiliza para obtener el token en Cognito. La API no lo necesita para validar el JWT y debe mantenerse fuera del codigo y del repositorio.
