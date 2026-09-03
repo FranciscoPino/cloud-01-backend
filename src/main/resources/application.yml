@@ -1,0 +1,18 @@
+spring:
+  config:
+    import: optional:file:.env[.properties]
+  application:
+    name: cloud-01-backend
+  profiles:
+    default: cognito
+
+---
+spring:
+  config:
+    activate:
+      on-profile: cognito
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: ${COGNITO_ISSUER_URI}
