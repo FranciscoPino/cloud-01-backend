@@ -61,12 +61,23 @@ Una solicitud sin token, con un token expirado o con otro `client_id` responde `
 6. Si el token es valido, la solicitud llega a `GET /api/demo` y la API responde `200 OK` con el JSON dummy.
 7. Si el token falta o no es valido, la solicitud se rechaza antes de llegar al controlador con `401 Unauthorized` y un mensaje JSON.
 
-```text
-Cliente -> Cognito: solicita access token con client_credentials
-Cognito -> Cliente: devuelve access token JWT
-Cliente -> API: GET /api/demo con Bearer token
-API -> API: valida firma, issuer, expiracion y client_id
-API -> Cliente: 200 OK o 401 Unauthorized
+```mermaid
+sequenceDiagram
+  participant Cliente
+  participant Cognito as Amazon Cognito
+  participant API as Spring Boot API
+
+  Cliente->>Cognito: Solicita token con client_credentials
+  Cognito-->>Cliente: Devuelve access token JWT
+  Cliente->>API: GET /api/demo con Bearer token
+  API->>API: Valida firma, issuer y expiracion
+  API->>API: Valida token_use=access y client_id
+
+  alt Token valido
+    API-->>Cliente: 200 OK + JSON dummy
+  else Token ausente o invalido
+    API-->>Cliente: 401 Unauthorized + JSON de error
+  end
 ```
 
 El `client_secret` se utiliza para obtener el token en Cognito. La API no lo necesita para validar el JWT y debe mantenerse fuera del codigo y del repositorio.
