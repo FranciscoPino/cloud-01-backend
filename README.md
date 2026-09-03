@@ -42,7 +42,16 @@ Authorization: Bearer <access-token-de-cognito>
 
 Spring Security obtiene las claves publicas del User Pool desde el `issuer-uri` y valida la firma y las fechas del token.
 
-Una solicitud sin token, con un token expirado o con otro `client_id` responde `401 Unauthorized`.
+Una solicitud sin token, con un token expirado o con otro `client_id` responde `401 Unauthorized` e incluye el motivo del rechazo en el campo `reason`:
+
+```json
+{
+  "status": 401,
+  "error": "Unauthorized",
+  "message": "Autenticacion rechazada",
+  "reason": "The token client_id is not authorized"
+}
+```
 
 ## Flujo de la aplicacion
 

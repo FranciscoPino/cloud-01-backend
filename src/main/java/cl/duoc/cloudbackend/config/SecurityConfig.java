@@ -37,7 +37,12 @@ public class SecurityConfig {
         AuthenticationEntryPoint unauthorizedEntryPoint = (request, response, authException) -> {
             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
             response.setContentType("application/json;charset=UTF-8");
-            response.getWriter().print("{\"status\":401,\"error\":\"Unauthorized\",\"message\":\"Autenticacion requerida\"}");
+            String reason = authException.getMessage() == null || authException.getMessage().isBlank()
+                ? "No se proporciono un token valido"
+                : authException.getMessage();
+            String escapedReason = reason.replace("\\", "\\\\").replace("\"", "\\\"");
+            response.getWriter().print("{\"status\":401,\"error\":\"Unauthorized\",\"message\":\"Autenticacion rechazada\",\"reason\":\""
+                + escapedReason + "\"}");
             response.getWriter().flush();
         };
 
