@@ -2,6 +2,77 @@
 
 API Spring Boot minima, lista para validar tokens JWT emitidos por Amazon Cognito.
 
+## Instalar y ejecutar en otro equipo
+
+### Requisitos
+
+- Java 21 o superior.
+- Apache Maven 3.9 o superior.
+- Git, para clonar el repositorio.
+
+Comprueba las herramientas instaladas:
+
+```powershell
+java -version
+mvn -version
+git --version
+```
+
+### Inicio rapido en localhost
+
+1. Clona el repositorio y entra a la carpeta del proyecto:
+
+  ```powershell
+  git clone https://github.com/FranciscoPino/cloud-01-backend.git
+  Set-Location cloud-01-backend
+  ```
+
+2. Compila y ejecuta las pruebas:
+
+  ```powershell
+  mvn clean test
+  ```
+
+3. Para ejecutar la API sin autenticacion durante el desarrollo, inicia el perfil `local`:
+
+  ```powershell
+  mvn spring-boot:run "-Dspring-boot.run.profiles=local"
+  ```
+
+4. Prueba el endpoint desde otra terminal:
+
+  ```powershell
+  Invoke-RestMethod "http://localhost:8080/api/demo"
+  ```
+
+  Respuesta esperada:
+
+  ```json
+  {
+    "message": "API Spring Boot operativa",
+    "status": "ok"
+  }
+  ```
+
+5. Deten la aplicacion con `Ctrl + C`.
+
+### Inicio protegido con Cognito
+
+El perfil predeterminado es `cognito`. Antes de iniciarlo, crea un archivo `.env` en la raiz del proyecto con valores de tu User Pool y App Client:
+
+```properties
+COGNITO_ISSUER_URI=https://cognito-idp.<region>.amazonaws.com/<user-pool-id>
+COGNITO_CLIENT_ID=<cognito-public-app-client-id>
+```
+
+Luego ejecuta:
+
+```powershell
+mvn spring-boot:run
+```
+
+La API queda disponible en `http://localhost:8080`. Sin un token Cognito valido, `/api/demo` responde `401 Unauthorized`.
+
 ## Ejecutar en modo local
 
 El perfil `cognito` es el predeterminado. Para ejecutar sin autenticacion durante el desarrollo, activa explicitamente el perfil `local`:
