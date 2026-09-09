@@ -92,10 +92,10 @@ jobs:
               docker rm ${{ env.CONTAINER_NAME }} || true
               docker image prune -f
   
-              # --- LA API ESCUCHA EN 8080 Y SE PUBLICA EN EL PUERTO 80 DEL HOST ---
+              # --- LA API ESCUCHA EN 80 Y SE PUBLICA EN EL PUERTO 8080 DEL HOST ---
               docker run -d \
                 --name ${{ env.CONTAINER_NAME }} \
-                -p 80:8080 \
+                -p 8080:80 \
                 -e COGNITO_ISSUER_URI='${{ secrets.COGNITO_ISSUER_URI }}' \
                 -e COGNITO_CLIENT_ID='${{ secrets.COGNITO_CLIENT_ID }}' \
                 --restart unless-stopped \

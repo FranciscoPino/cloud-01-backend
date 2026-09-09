@@ -10,6 +10,6 @@ RUN useradd -m springuser && chown -R springuser /app
 USER springuser
 
 # Spring Boot escucha en el puerto 8080 dentro del contenedor
-EXPOSE 8080
+EXPOSE 80
 
 ENTRYPOINT ["java", "-jar", "app.jar"]
