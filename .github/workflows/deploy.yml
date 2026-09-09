@@ -7,7 +7,7 @@ on:
 
 env:
   REGISTRY: ghcr.io
-  IMAGE_NAME: ${{ toLower(github.repository) }}
+  IMAGE_NAME: franciscopino/cloud-01-backend
   CONTAINER_NAME: cloud-01-backend
 
 jobs:
