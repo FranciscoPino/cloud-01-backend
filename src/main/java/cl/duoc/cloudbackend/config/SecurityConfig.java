@@ -87,8 +87,12 @@ public class SecurityConfig {
             @Value("${AZURE_AUDIENCE}") String audience) {
         NimbusJwtDecoder jwtDecoder = JwtDecoders.fromIssuerLocation(issuerUri);
         OAuth2TokenValidator<Jwt> issuerValidator = JwtValidators.createDefaultWithIssuer(issuerUri);
+        String normalizedAudience = audience.startsWith("api://")
+                ? audience.substring("api://".length())
+                : audience;
+        String apiAudience = "api://" + normalizedAudience;
         OAuth2TokenValidator<Jwt> audienceValidator = jwt -> {
-            if (!jwt.getAudience().contains(audience)) {
+            if (!jwt.getAudience().contains(normalizedAudience) && !jwt.getAudience().contains(apiAudience)) {
                 logger.warn("JWT audience rejected. Received: {}, expected: {}", jwt.getAudience(), audience);
                 return OAuth2TokenValidatorResult.failure(new OAuth2Error(
                         "invalid_token", "The token audience is not authorized", null));

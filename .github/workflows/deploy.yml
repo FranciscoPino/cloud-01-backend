@@ -46,13 +46,6 @@ jobs:
             echo "Missing required secret: AZURE_AUDIENCE"
             exit 1
           fi
-          case "$AZURE_AUDIENCE" in
-            api://*) ;;
-            *)
-              echo "AZURE_AUDIENCE must start with api://"
-              exit 1
-              ;;
-          esac
           case "$AZURE_ISSUER_URI" in
             https://login.microsoftonline.com/*/v2.0|https://sts.windows.net/*/) ;;
             *)
