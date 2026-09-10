@@ -37,9 +37,6 @@ jobs:
         env:
           AZURE_ISSUER_URI: ${{ secrets.AZURE_ISSUER_URI }}
           AZURE_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
-          COGNITO_TOKEN_URI: ${{ secrets.COGNITO_TOKEN_URI }}
-          COGNITO_CLIENT_ID: ${{ secrets.COGNITO_CLIENT_ID }}
-          COGNITO_CLIENT_SECRET: ${{ secrets.COGNITO_CLIENT_SECRET }}
         run: |
           if [ -z "$AZURE_ISSUER_URI" ]; then
             echo "Missing required secret: AZURE_ISSUER_URI"
@@ -47,18 +44,6 @@ jobs:
           fi
           if [ -z "$AZURE_CLIENT_ID" ]; then
             echo "Missing required secret: AZURE_CLIENT_ID"
-            exit 1
-          fi
-          if [ -z "$COGNITO_TOKEN_URI" ]; then
-            echo "Missing required secret: COGNITO_TOKEN_URI"
-            exit 1
-          fi
-          if [ -z "$COGNITO_CLIENT_ID" ]; then
-            echo "Missing required secret: COGNITO_CLIENT_ID"
-            exit 1
-          fi
-          if [ -z "$COGNITO_CLIENT_SECRET" ]; then
-            echo "Missing required secret: COGNITO_CLIENT_SECRET"
             exit 1
           fi
           case "$AZURE_ISSUER_URI" in
@@ -134,10 +119,6 @@ jobs:
                 -p 80:8080 \
                 -e AZURE_ISSUER_URI='${{ secrets.AZURE_ISSUER_URI }}' \
                 -e AZURE_CLIENT_ID='${{ secrets.AZURE_CLIENT_ID }}' \
-                -e COGNITO_TOKEN_URI='${{ secrets.COGNITO_TOKEN_URI }}' \
-                -e COGNITO_CLIENT_ID='${{ secrets.COGNITO_CLIENT_ID }}' \
-                -e COGNITO_CLIENT_SECRET='${{ secrets.COGNITO_CLIENT_SECRET }}' \
-                -e COGNITO_SCOPES='${{ secrets.COGNITO_SCOPES }}' \
                 --restart unless-stopped \
                 ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest
             "
