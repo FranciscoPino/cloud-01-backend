@@ -33,23 +33,38 @@ jobs:
       - name: Build and test with Maven
         run: mvn --batch-mode --no-transfer-progress clean verify
 
-      - name: Validate Cognito configuration
+      - name: Validate BFF identity configuration
         env:
-          COGNITO_ISSUER_URI: ${{ secrets.COGNITO_ISSUER_URI }}
+          AZURE_ISSUER_URI: ${{ secrets.AZURE_ISSUER_URI }}
+          AZURE_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
+          COGNITO_TOKEN_URI: ${{ secrets.COGNITO_TOKEN_URI }}
           COGNITO_CLIENT_ID: ${{ secrets.COGNITO_CLIENT_ID }}
+          COGNITO_CLIENT_SECRET: ${{ secrets.COGNITO_CLIENT_SECRET }}
         run: |
-          if [ -z "$COGNITO_ISSUER_URI" ]; then
-            echo "Missing required secret: COGNITO_ISSUER_URI"
+          if [ -z "$AZURE_ISSUER_URI" ]; then
+            echo "Missing required secret: AZURE_ISSUER_URI"
+            exit 1
+          fi
+          if [ -z "$AZURE_CLIENT_ID" ]; then
+            echo "Missing required secret: AZURE_CLIENT_ID"
+            exit 1
+          fi
+          if [ -z "$COGNITO_TOKEN_URI" ]; then
+            echo "Missing required secret: COGNITO_TOKEN_URI"
             exit 1
           fi
           if [ -z "$COGNITO_CLIENT_ID" ]; then
             echo "Missing required secret: COGNITO_CLIENT_ID"
             exit 1
           fi
-          case "$COGNITO_ISSUER_URI" in
-            https://cognito-idp.*amazonaws.com/*) ;;
+          if [ -z "$COGNITO_CLIENT_SECRET" ]; then
+            echo "Missing required secret: COGNITO_CLIENT_SECRET"
+            exit 1
+          fi
+          case "$AZURE_ISSUER_URI" in
+            https://login.microsoftonline.com/*/v2.0) ;;
             *)
-              echo "COGNITO_ISSUER_URI must be a Cognito issuer URL"
+              echo "AZURE_ISSUER_URI must be an Entra ID v2 issuer URL"
               exit 1
               ;;
           esac
@@ -117,8 +132,12 @@ jobs:
               docker run -d \
                 --name ${{ env.CONTAINER_NAME }} \
                 -p 80:8080 \
-                -e COGNITO_ISSUER_URI='${{ secrets.COGNITO_ISSUER_URI }}' \
+                -e AZURE_ISSUER_URI='${{ secrets.AZURE_ISSUER_URI }}' \
+                -e AZURE_CLIENT_ID='${{ secrets.AZURE_CLIENT_ID }}' \
+                -e COGNITO_TOKEN_URI='${{ secrets.COGNITO_TOKEN_URI }}' \
                 -e COGNITO_CLIENT_ID='${{ secrets.COGNITO_CLIENT_ID }}' \
+                -e COGNITO_CLIENT_SECRET='${{ secrets.COGNITO_CLIENT_SECRET }}' \
+                -e COGNITO_SCOPES='${{ secrets.COGNITO_SCOPES }}' \
                 --restart unless-stopped \
                 ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest
             "

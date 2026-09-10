@@ -4,15 +4,15 @@ spring:
   application:
     name: cloud-01-backend
   profiles:
-    default: cognito
+    default: azure
 
 ---
 spring:
   config:
     activate:
-      on-profile: cognito
+      on-profile: azure
   security:
     oauth2:
       resourceserver:
         jwt:
-          issuer-uri: ${COGNITO_ISSUER_URI}
+          issuer-uri: ${AZURE_ISSUER_URI}

@@ -36,8 +36,8 @@ public class SecurityConfig {
     }
 
     @Bean
-    @Profile("cognito")
-    SecurityFilterChain cognitoSecurityFilterChain(HttpSecurity http) throws Exception {
+    @Profile("azure")
+    SecurityFilterChain azureSecurityFilterChain(HttpSecurity http) throws Exception {
         AuthenticationEntryPoint unauthorizedEntryPoint = (request, response, authException) -> {
             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
             response.setContentType("application/json;charset=UTF-8");
@@ -77,24 +77,20 @@ public class SecurityConfig {
     }
 
     @Bean
-    @Profile("cognito")
-    JwtDecoder cognitoJwtDecoder(
+    @Profile("azure")
+    JwtDecoder azureJwtDecoder(
             @Value("${spring.security.oauth2.resourceserver.jwt.issuer-uri}") String issuerUri,
-            @Value("${COGNITO_CLIENT_ID}") String clientId) {
+            @Value("${AZURE_CLIENT_ID}") String clientId) {
         NimbusJwtDecoder jwtDecoder = JwtDecoders.fromIssuerLocation(issuerUri);
         OAuth2TokenValidator<Jwt> issuerValidator = JwtValidators.createDefaultWithIssuer(issuerUri);
-        OAuth2TokenValidator<Jwt> clientCredentialsValidator = jwt -> {
-            if (!"access".equals(jwt.getClaimAsString("token_use"))) {
+        OAuth2TokenValidator<Jwt> audienceValidator = jwt -> {
+            if (!jwt.getAudience().contains(clientId)) {
                 return OAuth2TokenValidatorResult.failure(new OAuth2Error(
-                        "invalid_token", "The token must be a Cognito access token", null));
-            }
-            if (!clientId.equals(jwt.getClaimAsString("client_id"))) {
-                return OAuth2TokenValidatorResult.failure(new OAuth2Error(
-                        "invalid_token", "The token client_id is not authorized", null));
+                        "invalid_token", "The token audience is not authorized", null));
             }
             return OAuth2TokenValidatorResult.success();
         };
-        jwtDecoder.setJwtValidator(new DelegatingOAuth2TokenValidator<>(issuerValidator, clientCredentialsValidator));
+        jwtDecoder.setJwtValidator(new DelegatingOAuth2TokenValidator<>(issuerValidator, audienceValidator));
         return jwtDecoder;
     }
 }
