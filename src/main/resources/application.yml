@@ -1,6 +1,6 @@
 spring:
   config:
-    import: optional:file:${ENV_FILE:.env.client-credentials}[.properties]
+    import: optional:file:${ENV_FILE:.env.oidc}[.properties]
   application:
     name: cloud-01-backend
   profiles:
