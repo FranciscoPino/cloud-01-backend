@@ -47,9 +47,9 @@ jobs:
             exit 1
           fi
           case "$AZURE_ISSUER_URI" in
-            https://login.microsoftonline.com/*/v2.0) ;;
+            https://login.microsoftonline.com/*/v2.0|https://sts.windows.net/*/) ;;
             *)
-              echo "AZURE_ISSUER_URI must be an Entra ID v2 issuer URL"
+              echo "AZURE_ISSUER_URI must be an Entra ID v1 or v2 issuer URL"
               exit 1
               ;;
           esac
