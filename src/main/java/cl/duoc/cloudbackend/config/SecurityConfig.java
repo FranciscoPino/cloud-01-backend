@@ -22,9 +22,13 @@ import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import org.springframework.http.HttpMethod;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 @Configuration
 public class SecurityConfig {
+
+    private static final Logger logger = LoggerFactory.getLogger(SecurityConfig.class);
 
     @Bean
     @Profile("local")
@@ -85,6 +89,7 @@ public class SecurityConfig {
         OAuth2TokenValidator<Jwt> issuerValidator = JwtValidators.createDefaultWithIssuer(issuerUri);
         OAuth2TokenValidator<Jwt> audienceValidator = jwt -> {
             if (!jwt.getAudience().contains(audience)) {
+                logger.warn("JWT audience rejected. Received: {}, expected: {}", jwt.getAudience(), audience);
                 return OAuth2TokenValidatorResult.failure(new OAuth2Error(
                         "invalid_token", "The token audience is not authorized", null));
             }
