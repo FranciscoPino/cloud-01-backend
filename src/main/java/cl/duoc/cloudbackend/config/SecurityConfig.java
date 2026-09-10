@@ -67,6 +67,7 @@ public class SecurityConfig {
                         .authenticationEntryPoint(unauthorizedEntryPoint)
                         .jwt(Customizer.withDefaults()))
                 .build();
+                
     }
 
     @Bean
