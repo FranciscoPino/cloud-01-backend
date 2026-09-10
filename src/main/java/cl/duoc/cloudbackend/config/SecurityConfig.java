@@ -83,8 +83,9 @@ public class SecurityConfig {
             @Value("${AZURE_CLIENT_ID}") String clientId) {
         NimbusJwtDecoder jwtDecoder = JwtDecoders.fromIssuerLocation(issuerUri);
         OAuth2TokenValidator<Jwt> issuerValidator = JwtValidators.createDefaultWithIssuer(issuerUri);
+        String apiAudience = clientId.startsWith("api://") ? clientId : "api://" + clientId;
         OAuth2TokenValidator<Jwt> audienceValidator = jwt -> {
-            if (!jwt.getAudience().contains(clientId)) {
+            if (!jwt.getAudience().contains(clientId) && !jwt.getAudience().contains(apiAudience)) {
                 return OAuth2TokenValidatorResult.failure(new OAuth2Error(
                         "invalid_token", "The token audience is not authorized", null));
             }
